@@ -1,0 +1,102 @@
+/*if((arr_relay[0]>cut_off_temp_H)||(arr_relay[1]>cut_off_temp_H)||(arr_relay[2]>cut_off_temp_H)||(arr_relay[3]>cut_off_temp_H)
+		||(arr_relay[4]>cut_off_temp_H)||(arr_relay[5]>cut_off_temp_H)||(arr_relay[6]>cut_off_temp_H)||(arr_relay[7]>cut_off_temp_H))
+			 {gpio_bit_set(GPIOC,GPIO_PIN_0);
+			 test =1;
+			 }
+	else {gpio_bit_reset(GPIOC,GPIO_PIN_0);}		 
+	if ((arr_relay[0]<cut_off_temp_L)&&(arr_relay[1]<cut_off_temp_L)&&(arr_relay[2]<cut_off_temp_L)&&(arr_relay[3]<cut_off_temp_L)
+		&&(arr_relay[4]<cut_off_temp_L)&&(arr_relay[5]<cut_off_temp_L)&&(arr_relay[6]<cut_off_temp_L)&&(arr_relay[7]<cut_off_temp_L))
+			{
+				while((arr_relay[0]<cut_off_temp_L2)&&(arr_relay[1]<cut_off_temp_L2)&&(arr_relay[2]<cut_off_temp_L2)&&(arr_relay[3]<cut_off_temp_L2)
+		&&(arr_relay[4]<cut_off_temp_L2)&&(arr_relay[5]<cut_off_temp_L2)&&(arr_relay[6]<cut_off_temp_L2)&&(arr_relay[7]<cut_off_temp_L2))
+				{
+				gpio_bit_set(GPIOC,GPIO_PIN_1);
+				test=2;
+				}
+				gpio_bit_reset(GPIOC,GPIO_PIN_1);
+			}*/
+	/*if(arr_relay[1]>CUT_OFF_TEMP_H || (arr_relay[1]>=CUT_OFF_TEMP_H2 && gpio_input_bit_get(GPIOC,GPIO_PIN_2)))
+	{
+		gpio_bit_set(GPIOC,GPIO_PIN_2);
+	}
+	else
+	{	
+		gpio_bit_reset(GPIOC,GPIO_PIN_2);
+	}
+	if (arr_relay[0]<=CUT_OFF_TEMP_L || (arr_relay[0]<=CUT_OFF_TEMP_L2 && gpio_input_bit_get(GPIOC,GPIO_PIN_1)))
+	{
+		gpio_bit_set(GPIOC,GPIO_PIN_0);
+		gpio_bit_set(GPIOC,GPIO_PIN_1);		
+	}
+	else 
+	{
+		gpio_bit_reset(GPIOC,GPIO_PIN_0);
+		gpio_bit_reset(GPIOC,GPIO_PIN_1);
+	}*/
+	if (previous_arr_relay_1==0)
+	{
+		previous_arr_relay_1=arr_relay[1];
+		previous_arr_relay_0=arr_relay[0];
+		//previous_arr_temp_1[0]=arr_relay[1];
+		//previous_arr_temp_0[0]=arr_relay[0];
+		temp_data_count=0;
+	}
+	difference0 = previous_arr_relay_0-arr_relay[0];
+	difference1 = previous_arr_relay_1-arr_relay[1];
+	difference = abs(difference0-difference1);
+	abstotal = abs(difference0+difference1);
+	total = difference0+difference1;
+	/*if(arr_relay[0]<= -50){gpio_bit_reset(GPIOC,GPIO_PIN_0);gpio_bit_reset(GPIOC,GPIO_PIN_1);}
+	else if (arr_relay[1]<= -50){gpio_bit_reset(GPIOC,GPIO_PIN_2);}*/
+	if(difference>40 || (-140 > total || total > 300) )//|| ((previous_arr_relay_1-arr_relay[1])>15) || ((previous_arr_relay_0-arr_relay[0])>15) )
+	{
+		temp_data_count=0;
+	previous_arr_relay_0=(previous_arr_relay_0+arr_relay[0])/2;
+	previous_arr_relay_1=(previous_arr_relay_1+arr_relay[1])/2;
+		temp_data_count++;
+		if(temp_data_count > 3)
+		{
+			if((((-80>arr_relay[0]) || (arr_relay[0]<200))&&((-80>arr_relay[1]) || (arr_relay[1]<200))))
+			{
+				if((previous_arr_relay_0-arr_relay[0])>15)
+				{
+					gpio_bit_reset(GPIOC,GPIO_PIN_0);
+					gpio_bit_reset(GPIOC,GPIO_PIN_1);
+					sensors = 0x01;
+					if(arr_relay[1]>CUT_OFF_TEMP_H || (arr_relay[1]>=CUT_OFF_TEMP_H2 && gpio_input_bit_get(GPIOC,GPIO_PIN_2)))
+					{
+						gpio_bit_set(GPIOC,GPIO_PIN_2);
+					}
+					else
+					{	
+						gpio_bit_reset(GPIOC,GPIO_PIN_2);
+					}
+				}
+				else
+				{
+					gpio_bit_reset(GPIOC,GPIO_PIN_2);
+					sensors = 0x02;
+					if (arr_relay[0]<=CUT_OFF_TEMP_L || (arr_relay[0]<=CUT_OFF_TEMP_L2 && gpio_input_bit_get(GPIOC,GPIO_PIN_1)))
+					{
+						gpio_bit_set(GPIOC,GPIO_PIN_0);
+						gpio_bit_set(GPIOC,GPIO_PIN_1);		
+					}
+					else 
+					{
+						gpio_bit_reset(GPIOC,GPIO_PIN_0);
+						gpio_bit_reset(GPIOC,GPIO_PIN_1);
+					}
+				}
+			}
+			else
+			{
+			
+				gpio_bit_reset(GPIOC,GPIO_PIN_0);
+				gpio_bit_reset(GPIOC,GPIO_PIN_1);
+				gpio_bit_reset(GPIOC,GPIO_PIN_2);
+				sensors = 0x04;
+			}
+		}
+	}
+	else
+	{	}
